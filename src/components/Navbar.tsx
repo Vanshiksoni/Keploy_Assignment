@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import SearchModal from "./SearchModal";
 import { BookOpen, ExternalLink } from "lucide-react";
 
 function KeployIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -27,7 +28,7 @@ function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white/90 dark:bg-[#0d0e10]/90 backdrop-blur-md border-b border-[#eaeaea] dark:border-[#23272e] transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-8 h-8 rounded-full bg-[#646f79] text-white flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
@@ -37,7 +38,7 @@ export default function Navbar() {
             <span className="font-semibold text-base tracking-tight text-[#0d0d0d] dark:text-white">
               Keploy<span className="text-[#646f79] dark:text-[#8e99a4]">Docs</span>
             </span>
-            <span className="inline-flex items-center justify-center leading-none text-xs font-medium tracking-wide px-3 py-1 rounded-full bg-[#f3f3f3] dark:bg-[#1f242b] text-[#646f79] dark:text-[#9aa4ae] border border-[#eaeaea] dark:border-[#2b3038]">
+            <span className="hidden md:inline-flex items-center justify-center leading-none text-xs font-medium tracking-wide px-3 py-1 rounded-full bg-[#f3f3f3] dark:bg-[#1f242b] text-[#646f79] dark:text-[#9aa4ae] border border-[#eaeaea] dark:border-[#2b3038]">
               Go Quickstart
             </span>
           </div>
@@ -45,6 +46,7 @@ export default function Navbar() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-3">
+          <SearchModal />
           <a
             href="https://keploy.io/docs"
             target="_blank"

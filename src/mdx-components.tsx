@@ -4,6 +4,7 @@ import CodeBlock from "@/components/CodeBlock";
 import InteractiveTerminal from "@/components/InteractiveTerminal";
 import ArchitectureFlow from "@/components/ArchitectureFlow";
 import Badge from "@/components/Badge";
+import QuickstartSelector from "@/components/QuickstartSelector";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -13,6 +14,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     InteractiveTerminal,
     ArchitectureFlow,
     Badge,
+    QuickstartSelector,
     h1: ({ children, ...props }) => (
       <h1 className="text-3xl sm:text-4xl font-normal tracking-tight text-[#0d0d0d] dark:text-white mb-6 mt-2 font-sans" {...props}>
         {children}
