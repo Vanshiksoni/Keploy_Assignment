@@ -1,81 +1,106 @@
-# 🚀 Keploy DevRel Candidate Assignment: Go (Echo + PostgreSQL) Quickstart & Documentation Site
+<div align="center">
 
-> A production-grade, developer-focused static documentation site built with **Next.js**, **MDX**, and styled using the **Asana Design System** (`designmd.co/d/asana`).
+# 🚀 Keploy DevRel Candidate Assignment
+### Go (Echo + PostgreSQL) Quickstart & Interactive Documentation Platform
 
----
-
-## 🎯 Overview & Submission Details
-
-This repository represents the completed candidate assignment for the **DevRel Role at Keploy**.
-
-- 🔗 **GitHub Repository**: [https://github.com/Vanshiksoni/Keploy_Assignment](https://github.com/Vanshiksoni/Keploy_Assignment)
-- 🌐 **Live Vercel Deployment**: [https://keploy-assignment-tau.vercel.app](https://keploy-assignment-tau.vercel.app) *(or your Vercel URL)*
-- 📄 **Assignment Spec**: Based on `devrel code + content assignment.pdf` (Echo + PostgreSQL Go Quickstart)
+[![Next.js](https://img.shields.io/badge/Next.js-16.3-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
+[![MDX](https://img.shields.io/badge/MDX-3.0-blue?style=for-the-badge&logo=mdx)](https://mdxjs.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Vercel Status](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel)](https://keploy-assignment-mu.vercel.app/)
 
 ---
 
-## 🌟 Key Features & DevRel Highlights
+### 🌐 [**Live Vercel Demo**](https://keploy-assignment-mu.vercel.app/) &nbsp;|&nbsp; 🐙 [**GitHub Repository**](https://github.com/Vanshiksoni/Keploy_Assignment)
 
-1. **Interactive CLI Terminal Simulator (`<InteractiveTerminal />`)**:
-   - Allows developers visiting the site to simulate running `keploy record` and `keploy test` live in their browser.
-   - Shows real-time network interception logs, captured PostgreSQL queries, and auto-generated YAML test specs.
+*A production-grade, developer-focused documentation site designed following the **Asana DesignMD System** (`designmd.co/d/asana`).*
 
-2. **Interactive Architecture Flow (`<ArchitectureFlow />`)**:
-   - Step-by-step visual diagram illustrating how Keploy sits transparently between HTTP clients, Echo Go servers, and PostgreSQL containers.
+</div>
 
-3. **Asana DesignMD Aesthetic (`designmd.co/d/asana`)**:
-   - Styled following Asana's minimal-maximalist design language (`#646f79` warm gray pills, rounded 16px cards, geometric sans typography).
+---
 
-4. **Command Palette Documentation Search (`⌘K` / `Ctrl+K`)**:
-   - Instant search modal across all documentation sections, CLI commands, and Go driver compatibility notes.
+## 🎯 Candidate Overview & Assignment Deliverables
 
-5. **Full Theme System (Light / Dark Mode)**:
-   - Built with Tailwind CSS v4 `@custom-variant dark` for seamless theme switching and high contrast across all components.
+This repository is submitted for the **DevRel Candidate Assignment at Keploy**.
+
+| Deliverable | Link / Resource | Description |
+| :--- | :--- | :--- |
+| 🌐 **Live Vercel Site** | [`keploy-assignment-mu.vercel.app`](https://keploy-assignment-mu.vercel.app/) | Deployed Next.js + MDX documentation site |
+| 🐙 **GitHub Repository** | [`Vanshiksoni/Keploy_Assignment`](https://github.com/Vanshiksoni/Keploy_Assignment) | Open-source Next.js codebase & custom components |
+| 📄 **Assignment Spec** | `devrel code + content assignment.pdf` | Based on Keploy's **Go (Echo + PostgreSQL)** Quickstart |
+
+---
+
+## 🌟 Key Features & Standout DevRel Implementations
+
+<table>
+  <tr>
+    <td width="50%">
+      <h3>⚡ Interactive Terminal Simulator</h3>
+      Simulate <code>keploy record</code> and <code>keploy test</code> live inside your browser without installing CLI binaries! View real-time SQL interception logs and generated YAML specs.
+    </td>
+    <td width="50%">
+      <h3>🔍 Command Palette (<code>⌘K</code> / <code>Ctrl+K</code>)</h3>
+      Instant topic search across CLI commands, PostgreSQL wire interception notes, GORM driver compatibility, and troubleshooting FAQs.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>⚙️ Go Quickstart Switcher</h3>
+      Interactive framework switcher allowing visitors to preview all 5 Keploy Go quickstarts (<em>Echo+Postgres, Gin+Redis, Mux+MySQL, FastHttp+Postgres</em>).
+    </td>
+    <td width="50%">
+      <h3>🎨 Asana DesignMD System</h3>
+      Styled with Asana's minimal-maximalist aesthetics (<code>#646f79</code> warm gray pills, rounded 16px cards, geometric typography, dark/light mode switcher).
+    </td>
+  </tr>
+</table>
 
 ---
 
 ## 💡 Key DevRel Insights: Why Keploy for Go Developers?
 
-Go microservices heavily utilize interface abstractions (`pgx`, `database/sql`, `gorm`). Traditionally, developers spend hours:
+Go microservices rely heavily on interface abstractions (`pgx`, `database/sql`, `gorm`). Traditionally, developers spend hours:
 - Writing manual mocks with `golang/mock` or `sqlmock`.
-- Maintaining database seed fixtures across CI/CD environments.
+- Maintaining database seed fixtures across local & CI environments.
 
-**Keploy's "Aha!" Moment**:
-Keploy operates at the Linux OS network socket layer (via eBPF / proxying), capturing the binary PostgreSQL Wire Protocol. When replaying tests (`keploy test`), Keploy mocks PostgreSQL responses automatically—**allowing Go developers to run 100% of their unit & API test suites without spinning up PostgreSQL database containers!**
+> ### 💡 The "Aha!" Moment for Go Engineers
+> Keploy operates at the OS network socket layer via eBPF and TCP proxies, capturing the binary **PostgreSQL Wire Protocol**. 
+> 
+> When replaying tests (`keploy test`), Keploy mocks PostgreSQL responses automatically—**allowing Go developers to run 100% of their unit & API test suites without spinning up PostgreSQL database containers!**
 
 ---
 
-## 🛠️ Project Structure
+## 🛠️ Project Architecture
 
-```
-.
+```gdn
+Keploy_Assignment/
 ├── src/
 │   ├── app/
-│   │   ├── globals.css         # Asana theme design tokens & Tailwind v4 config
-│   │   ├── layout.tsx          # Root layout with SEO metadata & navbar
-│   │   └── page.tsx            # Main page rendering MDX tutorial
+│   │   ├── globals.css          # Asana design tokens & Tailwind v4 config
+│   │   ├── layout.tsx           # SEO layout with navbar & footer
+│   │   └── page.tsx             # Main page rendering MDX tutorial
 │   ├── components/
-│   │   ├── ArchitectureFlow.tsx# Interactive eBPF proxy diagram
-│   │   ├── Badge.tsx           # Anti-MDX paragraph injection pill badge
-│   │   ├── Callout.tsx         # Sleek documentation alert callouts
-│   │   ├── CodeBlock.tsx       # Syntax highlighted code snippets with copy button
+│   │   ├── ArchitectureFlow.tsx # Interactive eBPF proxy diagram
+│   │   ├── Badge.tsx            # Pill badge component (MDX safe)
+│   │   ├── Callout.tsx          # Sleek documentation alert callouts
+│   │   ├── CodeBlock.tsx        # Code snippets with copy-to-clipboard
 │   │   ├── InteractiveTerminal.tsx # Live simulated keploy CLI terminal
-│   │   ├── Navbar.tsx          # Asana styled header with theme switch & Cmd+K search
+│   │   ├── Navbar.tsx           # Header with Cmd+K search & theme toggle
 │   │   ├── QuickstartSelector.tsx # 5 Go quickstarts interactive preview
-│   │   ├── SearchModal.tsx     # Cmd+K documentation search palette
-│   │   ├── SidebarTOC.tsx      # Table of contents with active scroll tracking
-│   │   └── ThemeToggle.tsx     # Light/Dark mode switcher
+│   │   ├── SearchModal.tsx      # Cmd+K search palette modal
+│   │   ├── SidebarTOC.tsx       # Table of contents with active scroll tracking
+│   │   └── ThemeToggle.tsx      # Dark / Light theme switcher
 │   ├── content/
-│   │   └── tutorial.mdx        # Full developer tutorial content
-│   └── mdx-components.tsx      # MDX custom component registry
-└── package.json
+│   │   └── tutorial.mdx         # Full developer tutorial content
+│   └── mdx-components.tsx       # MDX custom component registry
+├── README.md                    # Professional DevRel repository README
+└── package.json                 # Next.js & MDX configuration
 ```
 
 ---
 
-## 🚀 Local Development Setup
-
-To run this documentation project locally:
+## 💻 Local Development & Build Setup
 
 ```bash
 # 1. Clone the repository
@@ -85,26 +110,27 @@ cd Keploy_Assignment
 # 2. Install dependencies
 npm install
 
-# 3. Start development server
+# 3. Start local development server
 npm run dev
 
 # Open http://localhost:3000 in your browser.
 ```
 
----
-
-## 📦 Static Production Build
-
+### Static Production Build
 ```bash
-# Test static compilation & prerendering
+# Verify static compilation & prerendering
 npm run build
 
-# Start production server
+# Run production server locally
 npm start
 ```
 
 ---
 
-## 📄 License & Attribution
+<div align="center">
 
-Built with ❤️ for the **Keploy DevRel Team**.
+### Built with ❤️ for the **Keploy DevRel Team**
+
+[**Live Vercel Site**](https://keploy-assignment-mu.vercel.app/) &bull; [**GitHub Repository**](https://github.com/Vanshiksoni/Keploy_Assignment)
+
+</div>
