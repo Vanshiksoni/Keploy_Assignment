@@ -1,0 +1,248 @@
+import Callout from "@/components/Callout";
+import CodeBlock from "@/components/CodeBlock";
+import InteractiveTerminal from "@/components/InteractiveTerminal";
+import ArchitectureFlow from "@/components/ArchitectureFlow";
+import Badge from "@/components/Badge";
+
+<div className="mb-8 p-8 rounded-2xl bg-[#f8f8f8] dark:bg-[#15181c] border border-[#eaeaea] dark:border-[#23272e] shadow-xs">
+  <div className="flex items-center gap-2 mb-4">
+    <Badge>Official DevRel Quickstart Guide</Badge>
+  </div>
+  <h1 className="text-3xl sm:text-4xl font-normal text-[#0d0d0d] dark:text-white tracking-tight mb-3">
+    Automating End-to-End Tests for Go Apps with Keploy & PostgreSQL
+  </h1>
+  <p className="text-base text-[#646f79] dark:text-[#9aa4ae] leading-relaxed max-w-3xl font-sans">
+    Learn how to generate real-world API test suites and PostgreSQL database mocks automatically—without writing a single line of test code or mock logic.
+  </p>
+</div>
+
+<h2 id="overview">Overview & Why Keploy?</h2>
+
+As a Go developer building microservices with frameworks like **Echo**, writing unit tests and mocking database calls (such as PostgreSQL or MySQL) is historically tedious and time-consuming. You often spend more time writing boilerplate test suites, maintaining SQL mock interfaces, and syncing fixtures than shipping feature code.
+
+**Keploy changes this paradigm completely.** 
+
+Instead of writing manual unit tests or maintaining fragile mocks, Keploy acts as an **e2e test generator**. By intercepting network traffic (HTTP calls) and database protocols (PostgreSQL wire format) while your application runs, Keploy records incoming API requests and external dependency responses. It saves them as clean, version-controlled **YAML test cases**.
+
+<Callout type="tip" title="Why is this huge for Go developers?">
+  Go is strictly typed and relies heavily on interfaces for mocking (e.g., `pgx`, `database/sql`). Keploy eliminates the need to rewrite database driver interfaces or build mock databases. You test the exact compiled Go binary against real network traffic!
+</Callout>
+
+---
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+Before starting this quickstart, ensure you have the following installed on your system:
+
+- **Go 1.20+** installed on your machine (`go version`).
+- **Docker & Docker Compose** (to run the PostgreSQL database container).
+- **cURL** or **Postman** for sending sample HTTP requests.
+- **Linux, macOS, or WSL2** (Keploy utilizes eBPF/proxy capabilities for zero-code network interception).
+
+---
+
+<h2 id="architecture">Architecture & How It Works</h2>
+
+Here is how Keploy sits between your client, the Echo HTTP router, and PostgreSQL:
+
+<ArchitectureFlow />
+
+<Callout type="info" title="Under the Hood: SQL Wire Interception">
+  When your Echo app executes a SQL query via `database/sql` or `pgx`, PostgreSQL speaks the Postgres Wire Protocol over TCP port 5432. Keploy intercepts this binary protocol, storing both the query and the resulting SQL rows in YAML format. When replaying tests with <code>keploy test</code>, Keploy feeds these exact SQL rows back to your Go app—meaning **you don't even need PostgreSQL running during test runs!**
+</Callout>
+
+---
+
+<h2 id="step-1-app-setup">Step 1: Echo + Postgres URL Shortener App Setup</h2>
+
+Let's set up the sample URL shortener application built with the **Echo** web framework and **PostgreSQL**.
+
+Clone the official quickstart repository or create a new Go application:
+
+<CodeBlock
+  filename="terminal"
+  language="bash"
+  code={`# Clone the sample Go repository
+git clone https://github.com/keploy/samples-go.git
+cd samples-go/echo-postgres
+
+# View the project directory structure
+ls -la`}
+/>
+
+Here is a snippet of how the Echo application (`main.go`) initializes the Postgres connection and exposes the URL shortener routes:
+
+<CodeBlock
+  filename="main.go"
+  language="go"
+  code={`package main
+
+import (
+	"database/sql"
+	"net/http"
+	"github.com/labstack/echo/v4"
+	_ "github.com/lib/pq"
+)
+
+type URLRecord struct {
+	URL string \`json:"url"\`
+}
+
+func main() {
+	// 1. Connect to PostgreSQL
+	db, err := sql.Open("postgres", "postgres://postgres:password@localhost:5432/urlshortener?sslmode=disable")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// 2. Initialize Echo Router
+	e := echo.New()
+
+	// Route: Shorten URL (POST /shorten)
+	e.POST("/shorten", func(c echo.Context) error {
+		var req URLRecord
+		if err := c.Bind(&req); err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid payload"})
+		}
+		
+		shortCode := "k3p9L" // Generated short code
+		_, err := db.Exec("INSERT INTO urls (short_code, original_url) VALUES ($1, $2)", shortCode, req.URL)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "db error"})
+		}
+
+		return c.JSON(http.StatusOK, echo.Map{"short_url": "http://localhost:8080/" + shortCode})
+	})
+
+	e.Logger.Fatal(e.Start(":8080"))
+}`}
+/>
+
+---
+
+<h2 id="step-2-postgres-database">Step 2: Start PostgreSQL with Docker</h2>
+
+Start the PostgreSQL database container specified in `docker-compose.yml`:
+
+<CodeBlock
+  filename="terminal"
+  language="bash"
+  code={`# Start PostgreSQL container in detached mode
+docker-compose up -d
+
+# Verify Postgres is running on port 5432
+docker ps`}
+/>
+
+<Callout type="success" title="Database Connected">
+  PostgreSQL is now running on <code>localhost:5432</code> with the database table <code>urls</code> pre-initialized.
+</Callout>
+
+---
+
+<h2 id="step-3-keploy-installation">Step 3: Install Keploy CLI</h2>
+
+Download and install the latest Keploy binary on Linux or macOS / WSL2:
+
+<CodeBlock
+  filename="terminal"
+  language="bash"
+  code={`# Install Keploy CLI globally
+curl --silent --location https://raw.githubusercontent.com/keploy/keploy/main/keploy.sh | bash
+
+# Confirm installation
+keploy --version`}
+/>
+
+---
+
+<h2 id="step-4-recording-tests">Step 4: Record API Tests with `keploy record`</h2>
+
+Now comes the magic! Compile your Go app binary and run it through `keploy record`.
+
+<CodeBlock
+  filename="terminal"
+  language="bash"
+  code={`# 1. Build the Go binary
+go build -o main main.go
+
+# 2. Run Keploy in recording mode
+sudo keploy record -c "./main"`}
+/>
+
+While Keploy is running and monitoring traffic, open a separate terminal window to send HTTP API requests:
+
+<CodeBlock
+  filename="terminal"
+  language="bash"
+  code={`# Send a POST request to shorten a URL
+curl -X POST http://localhost:8080/shorten \\
+  -H "Content-Type: application/json" \\
+  -d '{"url": "https://keploy.io"}'
+
+# Expected Response:
+# {"short_url": "http://localhost:8080/k3p9L"}`}
+/>
+
+Press `Ctrl + C` in the Keploy recording terminal to stop the session.
+
+<Callout type="tip" title="What just happened?">
+  Keploy intercepted both the incoming HTTP <code>POST /shorten</code> request AND the resulting <code>INSERT INTO urls</code> SQL query sent to PostgreSQL. It saved a complete test case and SQL mock under the <code>./keploy</code> directory!
+</Callout>
+
+---
+
+<h2 id="step-5-testing-mocking">Step 5: Replay Tests & Dependency Mocks with `keploy test`</h2>
+
+Now, stop your PostgreSQL database container (`docker-compose down`). We will run tests **without any database server running!**
+
+<CodeBlock
+  filename="terminal"
+  language="bash"
+  code={`# Stop the PostgreSQL database
+docker-compose down
+
+# Run automated tests using saved Keploy mocks
+sudo keploy test -c "./main" --delay 10`}
+/>
+
+Keploy spins up your Go binary, intercepts PostgreSQL connection attempts, and injects the recorded SQL response data automatically!
+
+---
+
+<h2 id="interactive-demo">Interactive Terminal Demo</h2>
+
+Test out the Keploy workflow right here in your browser with our interactive terminal simulator:
+
+<InteractiveTerminal />
+
+---
+
+<h2 id="devrel-insights">DevRel Insights & "Aha!" Moments</h2>
+
+During our testing of the Echo + PostgreSQL quickstart, we uncovered several valuable insights for Go engineers:
+
+1. **Zero Code Changes**: You don't need to import any Keploy SDK inside `main.go`. Keploy works entirely at the network packet proxy layer.
+2. **Speed & CI Integration**: Running tests with recorded PostgreSQL mocks takes milliseconds compared to spinning up heavy Docker containers in GitHub Actions CI pipelines.
+3. **Determinism**: Random values (like timestamps or UUIDs) can be masked in Keploy YAML configs so tests never fail due to transient data differences.
+
+---
+
+<h2 id="troubleshooting">Troubleshooting FAQ</h2>
+
+<div className="space-y-3 my-6 font-sans">
+  <div className="p-4 rounded-2xl border border-[#eaeaea] dark:border-[#23272e] bg-[#f8f8f8] dark:bg-[#15181c]">
+    <h4 className="font-semibold text-[#0d0d0d] dark:text-white text-sm mb-1">Q: Permission denied when running keploy?</h4>
+    <p className="text-xs text-[#646f79] dark:text-[#9aa4ae]">
+      Keploy requires administrative capabilities (or <code>sudo</code>) to attach network socket interceptors via eBPF.
+    </p>
+  </div>
+
+  <div className="p-4 rounded-2xl border border-[#eaeaea] dark:border-[#23272e] bg-[#f8f8f8] dark:bg-[#15181c]">
+    <h4 className="font-semibold text-[#0d0d0d] dark:text-white text-sm mb-1">Q: Can I use this with GORM or SQLx?</h4>
+    <p className="text-xs text-[#646f79] dark:text-[#9aa4ae]">
+      Yes! Keploy operates at the wire protocol level, so whether you use <code>database/sql</code>, <code>GORM</code>, <code>sqlx</code>, or <code>pgx</code>, all queries are captured identically.
+    </p>
+  </div>
+</div>
